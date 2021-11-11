@@ -29,22 +29,27 @@ typedef union {
 } ArrayContent;
 
 typedef struct {
-    ArrayContent *array_content;
+    ArrayContent content;
+    ArrayType type;
+} ArrayElement;
+
+typedef struct {
+    ArrayElement *elements;
     size_t length;
     size_t max_size;
 } Array;
 
 Array *Array_new(size_t max_size);
 size_t Array_push(Array *a, ArrayType type, void *src);
-ArrayContent *Array_pop(Array *a);
+ArrayContent Array_pop(Array *a);
 
 Array *Array_new(size_t max_size)
 {
     Array *a = (Array *)malloc(sizeof(Array));
     a->max_size = max_size;
     a->length = 0;
-    ArrayContent *ac = (ArrayContent *)malloc( sizeof(ArrayContent) * max_size );
-    a->array_content = ac;
+    ArrayElement *ae = (ArrayElement *)malloc( sizeof(ArrayElement) * max_size );
+    a->elements = ae;
 
     return a;
 }
@@ -61,17 +66,21 @@ size_t Array_push(Array *a, ArrayType type, void *src)
     // Set new data
     switch (type) {
         case CHAR:
-            a->array_content[a->length].contentChar = *(char *)src;
+            a->elements[a->length].content.contentChar = *(char *)src;
+            a->elements[a->length].type = type;
             break;
         case INT:
-            a->array_content[a->length].contentInt = *(int *)src;
+            a->elements[a->length].content.contentInt = *(int *)src;
+            a->elements[a->length].type = type;
             break;
         case FLOAT:
-            a->array_content[a->length].contentFloat = *(float *)src;
+            a->elements[a->length].content.contentFloat = *(float *)src;
+            a->elements[a->length].type = type;
             break;
         case STRING:
             strcpy(str, (char *)src);
-            a->array_content[a->length].contentString = str;
+            a->elements[a->length].content.contentString = str;
+            a->elements[a->length].type = type;
             break;
         default:
             fprintf(stderr, "ERROR: Nothing to push");
@@ -85,5 +94,9 @@ size_t Array_push(Array *a, ArrayType type, void *src)
 
 }
 
+ArrayContent Array_pop(Array *a)
+{
+
+}
 
 #endif
