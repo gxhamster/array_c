@@ -15,6 +15,7 @@
 #define RETURN_SUCCESS 0
 
 typedef enum {
+   EMPTY,
    CHAR,
    INT,
    FLOAT,
@@ -41,7 +42,14 @@ typedef struct {
 
 Array *Array_new(size_t max_size);
 size_t Array_push(Array *a, ArrayType type, void *src);
-ArrayContent Array_pop(Array *a);
+ArrayElement *Array_pop(Array *a);
+ArrayElement *Array_find(Array *a, void *src);
+
+#endif
+
+/* Array implementation starts here */
+
+#ifdef A_IMPL
 
 Array *Array_new(size_t max_size)
 {
@@ -94,9 +102,23 @@ size_t Array_push(Array *a, ArrayType type, void *src)
 
 }
 
-ArrayContent Array_pop(Array *a)
-{
 
+
+ArrayElement *Array_pop(Array *a)
+{
+    NULL_CHECK(a);
+    if (a->length <= 0) {
+        fprintf(stderr, "ERROR: array length is 0 ");
+        return;
+    }
+
+    // Make a copy of the element
+    ArrayElement *val = (ArrayElement *)malloc(sizeof(ArrayElement));
+    memcpy(val, &a->elements[a->length - 1], sizeof(ArrayElement));
+
+    // Remove the element from array
+    memset(&a->elements[a->length -1], 0, sizeof(ArrayElement));
+    return val;
 }
 
 #endif
