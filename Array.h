@@ -1,9 +1,10 @@
 #ifndef ARRAY_H_
 #define ARRAY_H_
 
-/* An Array implementaion that can handle multiple data types
+/*
+ * An Array implementaion that can handle multiple data types
  * Most similar to javascript arrays
- * */
+ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +12,7 @@
 
 #define NULL_CHECK(a) { if (a == NULL) exit(-1);}
 #define VOID_P(p) (void *)p
-#define A_CALLBACK(p) void (*p)(ArrayElement elem, int idx)
+#define A_CALLBACK_P(p) void (*p)(ArrayElement elem, int idx)
 #define RETURN_ERR -1
 #define RETURN_SUCCESS 0
 
@@ -24,14 +25,14 @@ typedef enum {
 } ArrayType;
 
 typedef union {
-    char *contentString;
-    char contentChar;
-    int contentInt;
-    float contentFloat;
-} ArrayContent;
+    char *dataString;
+    char dataChar;
+    int dataInt;
+    float dataFloat;
+} ArrayData;
 
 typedef struct {
-    ArrayContent content;
+    ArrayData data;
     ArrayType type;
 } ArrayElement;
 
@@ -79,20 +80,20 @@ size_t Array_push(Array *a, ArrayType type, void *src)
     // Set new data
     switch (type) {
         case CHAR:
-            a->elements[a->length].content.contentChar = *(char *)src;
+            a->elements[a->length].data.dataChar = *(char *)src;
             a->elements[a->length].type = type;
             break;
         case INT:
-            a->elements[a->length].content.contentInt = *(int *)src;
+            a->elements[a->length].data.dataInt = *(int *)src;
             a->elements[a->length].type = type;
             break;
         case FLOAT:
-            a->elements[a->length].content.contentFloat = *(float *)src;
+            a->elements[a->length].data.dataFloat = *(float *)src;
             a->elements[a->length].type = type;
             break;
         case STRING:
             strcpy(str, (char *)src);
-            a->elements[a->length].content.contentString = str;
+            a->elements[a->length].data.dataString = str;
             a->elements[a->length].type = type;
             break;
         default:
@@ -106,7 +107,6 @@ size_t Array_push(Array *a, ArrayType type, void *src)
     return a->length;
 
 }
-
 
 
 ArrayElement *Array_pop(Array *a)
@@ -135,7 +135,7 @@ void Array_foreach(Array *a,
 {
     NULL_CHECK(callback);
 
-    int i;
+    size_t i;
     for (i = 0; i < a->length; i++) {
         (*callback)(a->elements[i], i);
     }
