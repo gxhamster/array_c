@@ -8,11 +8,15 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #define NULL_CHECK(a) { if (a == NULL) exit(-1);}
 #define VOID_P(p) (void *)p
 #define A_CALLBACK_P(p) void (*p)(ArrayElement elem, int idx)
+
+#define DEBUG(msg) fprintf(stderr, "DEBUG: %s", msg)
+
 #define RETURN_ERR -1
 #define RETURN_SUCCESS 0
 
@@ -45,11 +49,12 @@ typedef struct {
 Array *Array_new(size_t max_size);
 size_t Array_push(Array *a, ArrayType type, void *src);
 ArrayElement *Array_pop(Array *a);
-ArrayElement *Array_find(Array *a, void *src);
+ArrayElement *Array_find(Array *a, void *src,
+                         void (*callback)(ArrayElement *element, int index, Array *a));
 // Calls the callback function for every element and passes element
 // and its index
 void Array_foreach(Array *a,
-                   void (*callback)(ArrayElement element, int index));
+                   void (*callback)(ArrayElement *element, int index));
 
 #endif
 
@@ -114,7 +119,7 @@ ArrayElement *Array_pop(Array *a)
     NULL_CHECK(a);
     if (a->length <= 0) {
         fprintf(stderr, "ERROR: array length is 0 ");
-        return;
+        return NULL;
     }
 
     // Make a copy of the element (to return)
@@ -131,16 +136,45 @@ ArrayElement *Array_pop(Array *a)
 
 
 void Array_foreach(Array *a,
-                   void (*callback)(ArrayElement element, int index))
+                   void (*callback)(ArrayElement *element, int index))
 {
     NULL_CHECK(callback);
 
     size_t i;
     for (i = 0; i < a->length; i++) {
-        (*callback)(a->elements[i], i);
+        (*callback)(&a->elements[i], i);
     }
 }
 
 
+ArrayElement *Array_find(Array *a, void *src,
+                         void (*callback)(ArrayElement *element, int index, Array *a))
+{
+    size_t i;
+
+    for (i = 0; i < a->length; i++) {
+        // Call callback function
+        (*callback)(&a->elements[i], i, a);
+
+        if (a->elements[i].type == INT) {
+          if (a->elements[i].data.dataInt == *(int *)src) {
+            DEBUG("It is an int\n");
+            return &a->elements[i];
+          }
+        } else if (a->elements[i].type == STRING) {
+            if (strcmp(a->elements[i].data.dataString, (char *)src) == 0) {
+                DEBUG("It is a string\n");
+                return &a->elements[i];
+            }
+        } else if (a->elements[i].type == FLOAT) {
+            if (a->elements[i].data.dataFloat == *(float *)src) {
+                DEBUG("It is a float\n");
+                return &a->elements[i];
+            }
+        }
+
+    }
+    return NULL;
+}
 
 #endif
