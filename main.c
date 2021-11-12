@@ -1,35 +1,23 @@
 #define A_IMPL
-
 #include "Array.h"
 
-void foo(ArrayElement elem, int idx)
-{
-    if (elem.type == STRING)
-        printf("String: %s idx: %d\n", elem.data.dataString, idx);
 
-}
-
-void callback(ArrayElement *e, int idx, Array *a)
+void callback(ArrayElement *e, int idx)
 {
-    if (e->type == FLOAT)
-        e->data.dataFloat = 100.0;
+    if (e->data.dataInt == 100000)
+        printf("Found %d at %d\n", e->data.dataInt, idx);
 }
 
 int main(void)
 {
-    Array *a = Array_new(10);
-    char *str = "Hello World";
-    int n = 5;
-    float f = 200.4151;
-    Array_push(a, INT, VOID_P(&n));
-    Array_push(a, FLOAT, VOID_P(&f));
-    Array_push(a, STRING, VOID_P(str));
-    // Array_pop(a);
-
-    Array_find(a, &f, callback);
-    printf("%f\n", a->elements[1].data.dataString);
-
-    //A_CALLBACK_P(ptr) = &foo;
-    //Array_foreach(a, ptr);
+    int size = 10000000;
+    Array *a = Array_new(size);
+    int n = 100000;
+    char *str = "Hello again i am from a new world";
+    for (int i = 0; i < size; i++) {
+        Array_push(a, INT, &i);
+    }
+    Array_find(a, &n, callback);
+    //Array_fill(a, INT, &n);
 
 }
